@@ -1,5 +1,5 @@
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
 
 # Actual fit function
 def rawSin(par, x):
@@ -34,10 +34,10 @@ def partial(func, par, xData, yData, i):
 
 # Combines partials of each element of par into gradient vector
 def gradient(func, par, xData, yData):
-    gradient = np.array([])
+    gradient = []
     for i in range(len(par)):
-        gradient = gradient.append(partial(func, par, xData, yData, i))
-    return gradient
+        gradient.append(partial(func, par, xData, yData, i))
+    return np.array(gradient)
 
 # Time for school!
 # Recommended values:
@@ -45,9 +45,11 @@ def gradient(func, par, xData, yData):
 # decay2 = 0.99
 # shift = 1e-8
 def learnViaAdam(func, par, step, decay1, decay2, shift, xData, yData): # So many arguments, doing something inneficiently but not sure what (use a class?)
-    m = np.zeroes(len(par))
-    v = np.zeroes(len(par))
+    m = np.zeros(len(par))
+    v = np.zeros(len(par))
     t = 0
+    path = [par.copy()] # recording the path for visualization
+
     # this threshold needs elaboration, for now just going to hard code
     for _ in range(1000):
         t += 1
@@ -57,4 +59,74 @@ def learnViaAdam(func, par, step, decay1, decay2, shift, xData, yData): # So man
         mcor = m / (1 - decay1 ** t)                    #bias correction \/
         vcor = v / (1 - decay2 ** t)
         par -= step * mcor / (np.sqrt(vcor) + shift)    # parameter update
-    return par                                          #resulting params
+        path.append(par.copy())
+    return par, np.array(path)                                    #resulting params and path
+
+
+
+
+
+
+# Visualization: -------------------------
+def funcToArr(func, length, par):
+    f = []
+    for i in range(length):
+        f.append(func(par, i))
+    return np.array(f)
+
+
+def plotFit(fit, xData, yData, par):
+    fig, ax = plt.subplots()
+    ax.scatter(xData, yData)
+    ax.plot(funcToArr(fit, len(xData), par))
+    ax.set_title('Fit and Real Data')
+    plt.show()
+    return
+
+def plotError(par, path, xData, yData): #only plots a and b
+    fig = plt.figure()
+    ax = fig.add_subplot(111, projection='3d')
+
+    xCenter = par[0] #a
+    yCenter = par[1] #b
+    x = np.linspace(xCenter-500, xCenter+500, 10000)
+    y = np.linspace(yCenter-500, yCenter+500, 10000)
+    x, y = np.meshgrid(x, y)
+
+    z = avgError(par, xData, yData)
+    ax.plot_surface(x, y, z, cmap='viridis')
+
+    scatter = None
+
+    for i in path:
+
+        if scatter:
+            scatter.remove()
+
+        z = avgError(i, xData, yData)
+        ax.plot_surface(x, y, z, cmap='viridis')
+        ax.scatter(i[0], i[1], z, cmap='viridis')
+        plt.pause(0.1)
+
+    ax.set_title('Error data')
+    plt.show()
+    return
+
+
+# init ---------------
+def getInitParams():
+    init = int(input('Would you like to input your own initial parameters? If yes, enter 1, if no, enter 0: '))
+    if init == 0:
+
+        defaults = [100, 0.0001, 1, 200]
+        return defaults
+
+    if init == 1:
+        print("Now inputting parameters:")
+        print("function is of the form: (asin(bx + c) + d")
+        p1 = float(input('Input parameter a: '))
+        p2 = float(input('Input parameter b: '))
+        p3 = float(input('Input parameter c: '))
+        p4 = float(input('Input parameter d: '))
+        initParams = [p1, p2, p3, p4]
+        return initParams
