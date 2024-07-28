@@ -1,8 +1,10 @@
 import pandas as pd
 import datetime as dt
+import os
 
-def load_data(filename):
-    data = pd.read_csv(filename, skiprows=1)
+def load_data(filename, skip):
+    filename = os.path.abspath(filename)
+    data = pd.read_csv(filename, skiprows=skip)
     return data
 
 #for specific dataset

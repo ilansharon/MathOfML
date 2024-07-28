@@ -90,7 +90,7 @@ def animateFit(fit, xData, yData, path):
     for i in path:
         yfit = funcToArr(fit, len(xData), i)
         line.set_data(xData, yfit)
-        plt.pause(0.1)
+        plt.pause(0.01)
 
 
     ax.set_title('Fit and Real Data')
@@ -129,12 +129,9 @@ def plotError(par, path, xData, yData): #only plots a and b
 def plotScalarLoss(path, xData, yData):
     y = []
     for i in path:
-        y.append(avgError(i, xData, yData))
+        y.append(int(avgError(i, xData, yData)))
     y = np.array(y)
-    x = np.arange(1, len(path) - 1)
-    print(x)
-    print("that was x now this is y")
-    print(y)
+    x = np.arange(1, len(path) + 1)
     plt.plot(x, y)
     plt.xlabel('Time')
     plt.ylabel('Loss')
@@ -148,7 +145,7 @@ def getInitParams():
     init = int(input('Would you like to input your own initial parameters? If yes, enter 1, if no, enter 0: '))
     if init == 0:
 
-        defaults = [100, 0.1, 1, 400]
+        defaults = [100, 0.02, 1, 420]
         return defaults
 
     if init == 1:
