@@ -75,10 +75,24 @@ def funcToArr(func, length, par):
     return np.array(f)
 
 
-def plotFit(fit, xData, yData, par):
+def plotFinalFit(fit, xData, yData, par):
     fig, ax = plt.subplots()
     ax.scatter(xData, yData)
     ax.plot(funcToArr(fit, len(xData), par))
+    ax.set_title('Fit and Real Data')
+    plt.show()
+    return
+
+def animateFit(fit, xData, yData, path):
+    fig, ax = plt.subplots()
+    ax.scatter(xData, yData, label='Data')
+    line, = ax.plot(xData, funcToArr(fit, len(xData), path[0]), color='red', label='Fit')
+    for i in path:
+        yfit = funcToArr(fit, len(xData), i)
+        line.set_data(xData, yfit)
+        plt.pause(0.1)
+
+
     ax.set_title('Fit and Real Data')
     plt.show()
     return
@@ -112,13 +126,29 @@ def plotError(par, path, xData, yData): #only plots a and b
     plt.show()
     return
 
+def plotScalarLoss(path, xData, yData):
+    y = []
+    for i in path:
+        y.append(avgError(i, xData, yData))
+    y = np.array(y)
+    x = np.arange(1, len(path) - 1)
+    print(x)
+    print("that was x now this is y")
+    print(y)
+    plt.plot(x, y)
+    plt.xlabel('Time')
+    plt.ylabel('Loss')
+    plt.title('Scalar Loss / Time')
+    plt.show()
+
+
 
 # init ---------------
 def getInitParams():
     init = int(input('Would you like to input your own initial parameters? If yes, enter 1, if no, enter 0: '))
     if init == 0:
 
-        defaults = [100, 0.0001, 1, 200]
+        defaults = [100, 0.1, 1, 400]
         return defaults
 
     if init == 1:

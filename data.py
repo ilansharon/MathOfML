@@ -11,6 +11,8 @@ def clean_data(df):
     df[dateCol] = pd.to_datetime(df[dateCol])
     startTime = df[dateCol].min()
     timeSinceStart = df[dateCol] - startTime
-    df[dateCol] = timeSinceStart.dt.total_seconds()
+    df[dateCol] = timeSinceStart.dt.total_seconds() / 60
 
     return df
+
+
